@@ -33,10 +33,10 @@ def gcloud_build(c, setup = True):
     print("Cloning/building repo...")
 
     group.run("git clone --recursive https://github.com/Hoooao/libhotstuff.git hotstuff", warn=True)
-    group.run("cd hotstuff && git pull && git checkout main && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON && make -j4")
+    group.run("cd hotstuff && git pull && git checkout main && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON -DHOTSTUFF_ENABLE_BENCHMARK=ON && make -j4")
 
 @task
-def gcloud_setup(c):
+def setup(c):
     ips = get_gcloud_ips(c)
     with c.cd("deploy"):
         # write each pair in ips to a file in ./scripts/deploy/replica.txt
@@ -55,7 +55,7 @@ def gcloud_setup(c):
     return
 
 @task
-def gcloud_run(c, run_prefix=  "myrun1"):
+def run(c, run_prefix=  "myrun1"):
     with c.cd("deploy"):
         c.run(f"./run.sh new {run_prefix}")
         # Hao: wait for 5 seconds to make sure the rep is up
@@ -63,7 +63,7 @@ def gcloud_run(c, run_prefix=  "myrun1"):
         c.run(f"./run_cli.sh new {run_prefix}_cli")
 
 @task
-def gcloud_stop(c, run_prefix= "myrun1"):
+def stop(c, run_prefix= "myrun1"):
     # with c.cd("deploy"):
     #     c.run(f"./run_cli.sh stop {run_prefix}_cli")
     #     c.run(f"./run.sh stop {run_prefix}")
