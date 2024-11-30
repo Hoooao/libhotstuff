@@ -22,7 +22,7 @@ def get_gcloud_ips(c, keyword = "dev-"):
     return ips
 
 @task
-def gcloud_build(c, setup = True):
+def build(c, setup = False):
 
     ips = get_gcloud_ips(c)
     ext_ips = [ip[0] for ip in ips]
@@ -33,7 +33,7 @@ def gcloud_build(c, setup = True):
     print("Cloning/building repo...")
 
     group.run("git clone --recursive https://github.com/Hoooao/libhotstuff.git hotstuff", warn=True)
-    group.run("cd hotstuff && git pull && git checkout main && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON -DHOTSTUFF_ENABLE_BENCHMARK=ON && make -j4")
+    group.run("cd hotstuff && git pull && git checkout main && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON -g -DHOTSTUFF_ENABLE_BENCHMARK && make -j4")
 
 @task
 def setup(c):
