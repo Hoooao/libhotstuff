@@ -398,7 +398,10 @@ void HotStuffApp::print_stat() const {
     size_t _nrecv = 0;
     for (const auto &conn: client_conns)
     {
-        if (conn == nullptr) continue;
+        if (conn == nullptr) {
+            HOTSTUFF_LOG_INFO("conn is null");
+            continue;
+        }
         size_t ns = conn->get_nsent();
         size_t nr = conn->get_nrecv();
         size_t nsb = conn->get_nsentb();
