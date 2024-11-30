@@ -9,7 +9,7 @@ import requests
 import threading
 
 
-def get_gcloud_ips(c, keyword = "prod-"):
+def get_gcloud_ips(c, keyword = "dev-"):
     # parse gcloud CLI to get internalIP -> externalIP mapping    
     gcloud_output = c.run("gcloud compute instances list").stdout.splitlines()[1:]
     gcloud_output = map(lambda s: s.split(), gcloud_output)
@@ -33,7 +33,7 @@ def gcloud_build(c, setup = True):
     print("Cloning/building repo...")
 
     group.run("git clone --recursive https://github.com/Hoooao/libhotstuff.git hotstuff", warn=True)
-    group.run("cd hotstuff && git pull && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON && make -j4")
+    group.run("cd hotstuff && git pull && git checkout main && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON && make -j4")
 
 @task
 def gcloud_setup(c):
@@ -41,12 +41,13 @@ def gcloud_setup(c):
     with c.cd("deploy"):
         # write each pair in ips to a file in ./scripts/deploy/replica.txt
         with open("./deploy/replicas.txt", "w") as f:
-            for ip in ips[:4]:
+            for ip in ips:
+                f.write("    ".join(ip) + "\n")
                 f.write("    ".join(ip) + "\n")
                 
         # test ith colocate cli and rep first ...
         with open("./deploy/clients.txt", "w") as f:
-            for ip in ips[4:]:
+            for ip in ips:
                 f.write(ip[0] + "\n")
         c.run("./gen_all.sh")
     # goup.put("./deploy/replicas.txt","./hotstuff/scripts/deploy/")

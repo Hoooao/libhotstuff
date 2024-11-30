@@ -165,12 +165,15 @@ int main(int argc, char **argv) {
         size_t _;
         replicas.push_back(NetAddr(NetAddr(_p.first).ip, htons(stoi(_p.second, &_))));
     }
-    HOTSTUFF_LOG_INFO("Hao: we have to wait a while so it would not sends before the replicas are connected! ");
-    sleep(5);
-    HOTSTUFF_LOG_INFO("5s!");
     nfaulty = (replicas.size() - 1) / 3;
     HOTSTUFF_LOG_INFO("nfaulty = %zu", nfaulty);
     connect_all();
+
+    HOTSTUFF_LOG_INFO("Hao: we have to wait a while so it would not sends before the replicas are connected! ");
+    sleep(5);
+    HOTSTUFF_LOG_INFO("5s!");
+
+    
     while (try_send());
     ec.dispatch();
 
