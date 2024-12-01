@@ -1,15 +1,9 @@
-import os
 import time
 
-import invoke
-import yaml
 from fabric import Connection, SerialGroup, ThreadingGroup
 from invoke import task
-import requests
-import threading
 
-
-def get_gcloud_ips(c, keyword = "dev-"):
+def get_gcloud_ips(c, keyword = "prod-"):
     # parse gcloud CLI to get internalIP -> externalIP mapping    
     gcloud_output = c.run("gcloud compute instances list").stdout.splitlines()[1:]
     gcloud_output = map(lambda s: s.split(), gcloud_output)
@@ -22,7 +16,7 @@ def get_gcloud_ips(c, keyword = "dev-"):
     return ips
 
 @task
-def build(c, setup = False):
+def build(c, setup = True):
 
     ips = get_gcloud_ips(c)
     ext_ips = [ip[0] for ip in ips]
@@ -33,11 +27,11 @@ def build(c, setup = False):
     print("Cloning/building repo...")
 
     group.run("git clone --recursive https://github.com/Hoooao/libhotstuff.git hotstuff", warn=True)
-    group.run("cd hotstuff && git pull && git checkout main && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON -g -DHOTSTUFF_ENABLE_BENCHMARK && make -j4")
+    group.run("cd hotstuff && git pull && git checkout main &&  cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED=ON -DHOTSTUFF_PROTO_LOG=ON -DCMAKE_CXX_FLAGS='-g -DHOTSTUFF_ENABLE_BENCHMARK' && make -j4")
 
 @task
 def setup(c):
-    ips = get_gcloud_ips(c)
+    ips = get_gcloud_ips(c, keyword="replica")
     with c.cd("deploy"):
         # write each pair in ips to a file in ./scripts/deploy/replica.txt
         with open("./deploy/replicas.txt", "w") as f:
@@ -45,9 +39,16 @@ def setup(c):
                 f.write("    ".join(ip) + "\n")
                 f.write("    ".join(ip) + "\n")
                 
-        # test ith colocate cli and rep first ...
+        ips = get_gcloud_ips(c, keyword="client")
         with open("./deploy/clients.txt", "w") as f:
             for ip in ips:
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
                 f.write(ip[0] + "\n")
         c.run("./gen_all.sh")
     # goup.put("./deploy/replicas.txt","./hotstuff/scripts/deploy/")
@@ -58,8 +59,8 @@ def setup(c):
 def run(c, run_prefix=  "myrun1"):
     with c.cd("deploy"):
         c.run(f"./run.sh new {run_prefix}")
-        # Hao: wait for 5 seconds to make sure the rep is up
-        time.sleep(5)
+        # Hao: wait for 10 seconds to make sure the rep is up
+        time.sleep(10)
         c.run(f"./run_cli.sh new {run_prefix}_cli")
 
 @task
@@ -72,3 +73,10 @@ def stop(c, run_prefix= "myrun1"):
     group = ThreadingGroup(*ext_ips)
     group.run("killall -9 hotstuff-app", warn=True)
     group.run("killall -9 hotstuff-client", warn=True)
+
+@task
+def rm_testbed(c):
+    ips = get_gcloud_ips(c)
+    ext_ips = [ip[0] for ip in ips]
+    group = ThreadingGroup(*ext_ips)
+    group.run("rm -rf testbed")
