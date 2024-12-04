@@ -46,13 +46,7 @@ def setup(c):
                 f.write(ip[0] + "\n")
                 f.write(ip[0] + "\n")
                 f.write(ip[0] + "\n")
-                f.write(ip[0] + "\n")
-                f.write(ip[0] + "\n")
-                f.write(ip[0] + "\n")
-                f.write(ip[0] + "\n")
         c.run("./gen_all.sh")
-    # goup.put("./deploy/replicas.txt","./hotstuff/scripts/deploy/")
-    # goup.put("./deploy/clients.txt","./hotstuff/scripts/deploy/")
     return
 
 @task

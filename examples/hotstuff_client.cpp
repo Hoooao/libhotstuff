@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
     HOTSTUFF_LOG_INFO("nfaulty = %zu", nfaulty);
     connect_all();
 
-    HOTSTUFF_LOG_INFO("Hao: we have to wait a while so it would not sends before the replicas are connected! ");
+    HOTSTUFF_LOG_INFO("Hao: we wait a while so it would not sends before the replicas are setup ");
     sleep(5);
     HOTSTUFF_LOG_INFO("5s!");
 

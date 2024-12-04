@@ -455,6 +455,7 @@ void HotStuffBase::start(
                 e.second(Finality(id, 0, 0, 0, cmd_hash, uint256_t()));
             if (proposer != get_id()) continue;
             cmd_pending_buffer.push(cmd_hash);
+            LOG_INFO("cmd_pending_buffer.size() = %lu", cmd_pending_buffer.size());
             if (cmd_pending_buffer.size() >= blk_size)
             {
                 std::vector<uint256_t> cmds;

@@ -29,6 +29,7 @@ struct MsgReqCmd {
     DataStream serialized;
     command_t cmd;
     MsgReqCmd(const Command &cmd) { serialized << cmd; }
+    // Hao: this constructor is never used, so I guess the req is always 0
     MsgReqCmd(DataStream &&s): serialized(std::move(s)) {}
 };
 
