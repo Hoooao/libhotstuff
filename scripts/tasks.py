@@ -16,7 +16,7 @@ def get_gcloud_ips(c, keyword = "prod-"):
     return ips
 
 @task
-def build(c, setup = True):
+def build(c, setup = False):
 
     ips = get_gcloud_ips(c)
     ext_ips = [ip[0] for ip in ips]

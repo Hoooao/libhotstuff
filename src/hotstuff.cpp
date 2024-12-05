@@ -391,8 +391,11 @@ void HotStuffBase::do_vote(ReplicaID last_proposer, const Vote &vote) {
             //throw HotStuffError("unreachable line");
             on_receive_vote(vote);
         }
-        else
+        else{
+            LOG_INFO("send vote to %d", proposer);
             pn.send_msg(MsgVote(vote), get_config().get_peer_id(proposer));
+        }
+            
     });
 }
 
