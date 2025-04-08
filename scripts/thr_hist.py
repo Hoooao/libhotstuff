@@ -41,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default="hist.png", required=False)
     parser.add_argument('--plot', action='store_true')
     args = parser.parse_args()
-    commit_pat = re.compile('([^[].*) \[hotstuff info\] ([0-9.]*)$')
+    commit_pat = re.compile('([^[].*) \\[hotstuff info\\] ([0-9.]*)$')
     interval = args.interval
     begin_time = None
     next_begin_time = None
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         cnt += 1
     values.append(cnt)
     print(values)
-    print("lat = {:.3f}ms".format(sum(lats) / len(lats) * 1e3))
+    #print("lat = {:.3f}ms".format(sum(lats) / len(lats) * 1e3))
     lats, _ = remove_outliers(lats)
     print("lat = {:.3f}ms".format(sum(lats) / len(lats) * 1e3))
     if args.plot:

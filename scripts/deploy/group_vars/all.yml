@@ -30,4 +30,4 @@ hs_conf_dir: "conf"
 hs_log_dir: "log"
 hs_base_conf: "./hotstuff.gen.conf"
 # enable/disable TLS encrpytion for inter-replica communication
-hs_tls: false
+hs_tls: true

@@ -22,6 +22,9 @@
 #include "hotstuff/entity.h"
 #include "hotstuff/consensus.h"
 
+#define HOTSTUFF_CMD_REQSIZE 512
+#define HOTSTUFF_CMD_RESPSIZE 128
+
 namespace hotstuff {
 
 struct MsgReqCmd {

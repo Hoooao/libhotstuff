@@ -37,11 +37,14 @@ def setup(c):
         with open("./deploy/replicas.txt", "w") as f:
             for ip in ips:
                 f.write("    ".join(ip) + "\n")
-                f.write("    ".join(ip) + "\n")
                 
         ips = get_gcloud_ips(c, keyword="client")
         with open("./deploy/clients.txt", "w") as f:
             for ip in ips:
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
+                f.write(ip[0] + "\n")
                 f.write(ip[0] + "\n")
                 f.write(ip[0] + "\n")
                 f.write(ip[0] + "\n")
@@ -52,11 +55,39 @@ def setup(c):
 @task
 def run(c, run_prefix=  "myrun1"):
     with c.cd("deploy"):
+        print("Running... ",f"./run.sh new {run_prefix}")
         c.run(f"./run.sh new {run_prefix}")
-        # Hao: wait for 10 seconds to make sure the rep is up
-        time.sleep(10)
+        print("Running... ",f"./run_cli.sh new {run_prefix}_cli")
         c.run(f"./run_cli.sh new {run_prefix}_cli")
 
+def stop_cli_and_rep_and_fetch_results(c, run_prefix):
+    with c.cd("deploy"):
+        c.run(f"./run_cli.sh stop {run_prefix}_cli")
+        c.run(f"./run.sh stop {run_prefix}")
+        c.run(f"./run_cli.sh fetch {run_prefix}_cli")
+        
+# TODO: make block_size a parameter
+# invoke run-multiple  -a 260,300,400,500,600
+@task
+def run_multiple(c, async_nums):
+    async_nums = async_nums.split(",")
+    for i in async_nums:
+        with open("./deploy/group_vars/clients.yml", "w") as f:
+            f.write(f"""---
+    bin_name: "hotstuff-client"
+    # total number of commands
+    max_iter: 2000000
+    # number of concurrently outstanding requests (commands)
+    max_async: {i}
+    """)
+        
+        run_name = f"ben_4rep2cli_1000blk_4_4_8_{i}a_tls"
+        run(c, run_name)
+        time.sleep(18)
+        stop_cli_and_rep_and_fetch_results(c, run_name)
+
+    
+        
 @task
 def stop(c, run_prefix= "myrun1"):
     # with c.cd("deploy"):
